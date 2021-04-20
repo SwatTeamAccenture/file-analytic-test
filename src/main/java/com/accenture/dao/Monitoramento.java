@@ -14,10 +14,12 @@ public class Monitoramento {
 		try {
 			janelaDeProcessamento();
 			while (PARAR_MONITORAMENTO == false) {
-				monitorarPasta();
+				BusinessProcess.startProcess(path);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			PARAR_MONITORAMENTO = false;
 		}
 	}
 	
@@ -44,7 +46,4 @@ public class Monitoramento {
 	}
 	
 	
-	private static void monitorarPasta() {
-		System.out.println("pasta sendo monitorada");
-	}
 }
