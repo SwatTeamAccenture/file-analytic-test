@@ -34,19 +34,26 @@ public class MenuInicial {
 				}
 				case 2:{
 					in.reset();
-					PATH_DIRETORIO = Diretorio.trocarDiretorio();
+					String NEW_PATH_DIRETORIO = Diretorio.trocarDiretorio();
+					
+					if (NEW_PATH_DIRETORIO.equals(PATH_DIRETORIO) && !(NEW_PATH_DIRETORIO.length() >= 0)) {
+						PATH_DIRETORIO = NEW_PATH_DIRETORIO;
+					}
+					
 					iniciarMenu();
 					break;
 				}
 				default:{
 					in.reset();
 					System.err.println("você digitou uma opção inválida!");
+					iniciarMenu();
 					break;
 				}
 			}
 
 		} catch (Exception e) {
 			System.err.println("Você digitou um valor que não é um número!");
+			iniciarMenu();
 		}
 	}
 }
