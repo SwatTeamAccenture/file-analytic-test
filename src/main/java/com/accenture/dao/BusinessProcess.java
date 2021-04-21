@@ -54,14 +54,13 @@ public class BusinessProcess {
 			System.out.println("Processando o arquivo: " + fileName);
 			processedFiles.add(fileName);
 			String fullPath = FULL_PATH_IN + "\\" + fileName;
-			List<String> linhasDadosCompra = Files.readAllLines(Path.of(fullPath));		
+			List<String> linhasDadosCompra = Files.readAllLines(Path.of(fullPath));
 			for (String linha : linhasDadosCompra) {
 				processData(linha);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
 
 	private static void processData(String dado) {
@@ -91,24 +90,45 @@ public class BusinessProcess {
 		}
 	}
 	
+	private static List<String> columnTitle = new ArrayList<String>();
 	private static void sellerLogic(String[] seller) {
-		System.out.println("sou um vendedor!");		
+		System.out.println("sou um vendedor!" + seller);
+		try {
+			Report.generateReport(columnTitle, seller, fileName, loggerReport);
+		} catch (Exception e) {
+//			Report.generateReport(columnTitle, seller, fileName, loggerReport);
+		}
 	}
 	
 	private static void customerLogic(String[] customer) {
-		System.out.println("sou um cliente!");		
+		System.out.println("sou um cliente!" + customer);		
 	}
 	
 	private static void transactionLogic(String[] transaction) {
-		System.out.println("sou uma transação!");		
+		System.out.println("sou uma transação!" + transaction);
 	}
 	
+//	private static List<String> dataReportList = new ArrayList<String>();
 	
-	private static void generateRalatory() {
-		System.out.println("Gerado relatório");	
-	}
+//	private static void generateReport(List<String> columnTitle, List<String> columnData, String fileName, boolean loggerReport) {
+////		String[] columTitle = {"qtd. clientes", "qtd. vendedores", "id maior venda", "pior vendedor"};
+//
+//		String fullPath = !loggerReport ?  FULL_PATH_OUT + "\\" + fileName + ".txt" : FULL_PATH_LOGGER + "\\" + fileName + ".txt";
+////		String fullPath = FULL_PATH_OUT + "\\" + fileName + ".txt";
+//		try {
+//			dataReportList.clear();		
+//			for (String column : columnTitle) {
+//				dataReportList.add(column);
+//			}
+//			for (String dado : columnData) {
+//				dataReportList.add(dado);			
+//			}
+//			
+//			Files.write(Path.of(fullPath), dataReportList);
+//			
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 	
-	private static void generateLogger() {
-		System.out.println("Gerado relatório LOGGER_ERRO");
-	}
 }
