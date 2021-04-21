@@ -110,6 +110,10 @@ public class BusinessProcess {
 	
 	private static void gerarReportLogger() {
 		try {
+			File diretorio = new File(FULL_PATH_LOGGER);
+			if (!diretorio.exists()) {
+				diretorio.mkdirs();
+			}
 			String listaNova = 	FULL_PATH_LOGGER + "\\" + FILE_NAME.trim().toUpperCase()+".txt";
 						
 			Files.write(Path.of(listaNova), listaReportLogger);
