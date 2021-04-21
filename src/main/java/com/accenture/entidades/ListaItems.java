@@ -6,6 +6,13 @@ public class ListaItems {
 	private double price;
 	
 	
+	
+	public ListaItems(String totalToProcess) {
+		String [] item = totalToProcess.split("-");
+		this.id = Integer.parseInt(item[0]);
+		this.quantity =  Integer.parseInt(item[1]);
+		this.price = Double.parseDouble(item[2]);
+	}
 	public int getId() {
 		return id;
 	}

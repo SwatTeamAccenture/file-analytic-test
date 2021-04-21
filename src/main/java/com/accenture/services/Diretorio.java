@@ -1,4 +1,4 @@
-package com.accenture.dao;
+package com.accenture.services;
 
 public class Diretorio {
 	

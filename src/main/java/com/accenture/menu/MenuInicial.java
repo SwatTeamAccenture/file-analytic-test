@@ -2,8 +2,8 @@ package com.accenture.menu;
 
 import java.util.Scanner;
 
-import com.accenture.dao.Diretorio;
-import com.accenture.dao.Monitoramento;
+import com.accenture.services.Diretorio;
+import com.accenture.services.Monitoramento;
 
 public class MenuInicial {
 	
