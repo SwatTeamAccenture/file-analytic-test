@@ -66,8 +66,11 @@ public class BusinessProcess {
 			
 			// Gerar relatório
 			gerarReport();
+//			listaReportLogger.size() > 0 ? gerarReport();
+			if (listaReportLogger.size() > 0) {
+				gerarReportLogger();
+			}
 		} catch (Exception e) {
-			// Gerar Logger se erro
 			e.printStackTrace();
 		}
 	}
@@ -80,6 +83,8 @@ public class BusinessProcess {
 	
 	
 	private static void resetDataReportValues() {
+
+		listaReportLogger.clear();
 		setQTD_CLIENTES(0);
 		setQTD_VENDEDORES(0);
 		setID_MAIOR_VENDA(0);
@@ -101,6 +106,20 @@ public class BusinessProcess {
 		}
 		
 	}
+	private static List<String> listaReportLogger = new ArrayList<String>();
+	
+	private static void gerarReportLogger() {
+		try {
+			String listaNova = 	FULL_PATH_LOGGER + "\\" + FILE_NAME.trim().toUpperCase()+".txt";
+						
+			Files.write(Path.of(listaNova), listaReportLogger);
+			System.out.println("Reporte Logger Gerado para o arquivo: " + FILE_NAME);
+			} catch (IOException e) {
+				System.out.println("Problemas ao gerar reporte logger!");
+				e.printStackTrace();
+			}
+	}
+	
 	
 	private static void processData(String dado) {
 		String [] colunas = dado.split("ç");
@@ -120,7 +139,8 @@ public class BusinessProcess {
 					break;
 				}
 				default:{
-					System.err.println("Arquivo sem identificador válido");
+//					System.err.println("Arquivo sem identificador válido");
+					listaReportLogger.add(dado);
 					break;
 				}
 			}
