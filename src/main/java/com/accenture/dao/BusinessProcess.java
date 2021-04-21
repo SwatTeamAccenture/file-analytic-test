@@ -94,7 +94,7 @@ public class BusinessProcess {
 	private static void sellerLogic(String[] seller) {
 		System.out.println("sou um vendedor!" + seller);
 		try {
-			Report.generateReport(columnTitle, seller, fileName, loggerReport);
+//			Report.generateReport(columnTitle, seller, fileName, loggerReport);
 		} catch (Exception e) {
 //			Report.generateReport(columnTitle, seller, fileName, loggerReport);
 		}
