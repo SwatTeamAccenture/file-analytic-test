@@ -19,19 +19,32 @@ public class BusinessProcess {
 	private static String FULL_PATH_IN = "";
 	private static String FULL_PATH_OUT = "";
 	private static String FULL_PATH_LOGGER = "";
+	private static String PATH = "";
+	private static List<String> processedFiles = new ArrayList<String>();
 	
-	public static void startProcess(String path) throws IOException {		
-		setPaths(path);
+	public static void startProcess(String path) throws IOException {
+		checkPath(path);
+//		setPaths(path);
 		lerDiretorio();
 	}
 	
-	private static void setPaths(String path) {
-		FULL_PATH_IN = path + "\\HOMEPATH\\data\\in";
-		FULL_PATH_OUT = path + "\\HOMEPATH\\data\\out";
-		FULL_PATH_LOGGER = path + "\\HOMEPATH\\data\\logger";
+	private static void checkPathssa(String path) {
+		if (PATH != path) {
+			PATH = path;
+			processedFiles.clear();
+		};
 	}
 	
-	private static List<String> processedFiles = new ArrayList<String>();
+	private static void checkPath(String path) {		
+		if (PATH != path) {
+			PATH = path;
+			processedFiles.clear();
+			FULL_PATH_IN = path + "\\HOMEPATH\\data\\in";
+			FULL_PATH_OUT = path + "\\HOMEPATH\\data\\out";
+			FULL_PATH_LOGGER = path + "\\HOMEPATH\\data\\logger";
+		};
+	}
+	
 	
 	private static void lerDiretorio() {
 		File arquivos[];

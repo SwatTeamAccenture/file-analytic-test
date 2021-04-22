@@ -8,7 +8,7 @@ import com.accenture.services.Monitoramento;
 public class MenuInicial {
 	
 	private static String PATH_DIRETORIO = "C:\\Users\\Micro\\Desktop\\teste";
-	
+	// C:\Users\Micro\Desktop\teste_2
 	public static void iniciarMenu() {
 		@SuppressWarnings("resource")
 		Scanner in = new Scanner(System.in);
@@ -35,11 +35,9 @@ public class MenuInicial {
 				case 2:{
 					in.reset();
 					String NEW_PATH_DIRETORIO = Diretorio.trocarDiretorio();
-					
-					if (NEW_PATH_DIRETORIO.equals(PATH_DIRETORIO) && !(NEW_PATH_DIRETORIO.length() >= 0)) {
-						PATH_DIRETORIO = NEW_PATH_DIRETORIO;
+					if (!NEW_PATH_DIRETORIO.equals(PATH_DIRETORIO) && NEW_PATH_DIRETORIO.length() > 0) {
+						setPATH_DIRETORIO(NEW_PATH_DIRETORIO);
 					}
-					
 					iniciarMenu();
 					break;
 				}
@@ -56,4 +54,12 @@ public class MenuInicial {
 			iniciarMenu();
 		}
 	}
+	public static String getPATH_DIRETORIO() {
+		return PATH_DIRETORIO;
+	}
+	public static void setPATH_DIRETORIO(String pATH_DIRETORIO) {
+		PATH_DIRETORIO = pATH_DIRETORIO;
+	}
+	
+	
 }
