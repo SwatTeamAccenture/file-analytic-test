@@ -23,36 +23,48 @@ public class BusinessProcess {
 	private static List<String> processedFiles = new ArrayList<String>();
 	
 	public static void startProcess(String path) throws IOException {
-		checkPath(path);
-//		setPaths(path);
+		checkAndSetPaths(path);
 		lerDiretorio();
 	}
 	
-	private static void checkPathssa(String path) {
-		if (PATH != path) {
-			PATH = path;
-			processedFiles.clear();
-		};
-	}
-	
-	private static void checkPath(String path) {		
+	private static void checkAndSetPaths(String path) {		
 		if (PATH != path) {
 			PATH = path;
 			processedFiles.clear();
 			FULL_PATH_IN = path + "\\HOMEPATH\\data\\in";
 			FULL_PATH_OUT = path + "\\HOMEPATH\\data\\out";
 			FULL_PATH_LOGGER = path + "\\HOMEPATH\\data\\logger";
+			checkDirectories();
 		};
+	}
+	
+	private static void checkDirectories() {
+		File diretorio_in = new File(FULL_PATH_LOGGER);
+		File diretorio_out = new File(FULL_PATH_LOGGER);
+		File diretorio_logger = new File(FULL_PATH_LOGGER);
+		
+		if (!diretorio_in.exists()) {
+			diretorio_in.mkdirs();
+		}
+		
+		if (!diretorio_out.exists()) {
+			diretorio_out.mkdirs();
+		}
+		
+		if (!diretorio_logger.exists()) {
+			diretorio_logger.mkdirs();
+		}
 	}
 	
 	
 	private static void lerDiretorio() {
+		
 		File arquivos[];
 		File diretorio = new File(FULL_PATH_IN);
 		arquivos = diretorio.listFiles();
 		
 		for(int i = 0; i < arquivos.length; i++){
-			/** Caso o arquivo não tenha sido processado, iremos processar */
+			/** Somente analisar os arquivos não processados. */
 			if(!processedFiles.contains(arquivos[i].getName())) {
 				processFile(arquivos[i].getName());
 			}
@@ -96,13 +108,13 @@ public class BusinessProcess {
 	
 	
 	private static void resetDataReportValues() {
-
 		listaReportLogger.clear();
 		setQTD_CLIENTES(0);
 		setQTD_VENDEDORES(0);
 		setID_MAIOR_VENDA(0);
 		setPIOR_VENDEDOR("");
 	}
+	
 	private static void gerarReport() {
 		try {
 		String listaNova = 	FULL_PATH_OUT + "\\" + FILE_NAME.trim().toUpperCase()+".txt";
@@ -156,7 +168,6 @@ public class BusinessProcess {
 					break;
 				}
 				default:{
-//					System.err.println("Arquivo sem identificador válido");
 					listaReportLogger.add(dado);
 					break;
 				}
@@ -165,16 +176,13 @@ public class BusinessProcess {
 			e.printStackTrace();
 		}
 	}
-	
-	private static List<String> columnTitle = new ArrayList<String>();
-	
+		
 	private static void sellerLogic(String[] seller) {
 		try {
 			int qtdVendedores = getQTD_VENDEDORES() + 1;
 			setQTD_VENDEDORES(qtdVendedores);
 		} catch (Exception e) {
 			e.printStackTrace();
-//			Report.generateReport(columnTitle, seller, fileName, loggerReport);
 		}
 	}
 	
