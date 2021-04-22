@@ -7,40 +7,61 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.accenture.entidades.Data;
 import com.accenture.entidades.Transaction;
-import com.accenture.entidades.Vendedor;
 
 public class BusinessProcess {
 	
-	List<Data> listaBruto = new ArrayList<Data>();
-
+	private static String PATH = "";
 	private static String FILE_NAME = "";
+	private static String FILE_PATH = "";
 	private static String FULL_PATH_IN = "";
 	private static String FULL_PATH_OUT = "";
 	private static String FULL_PATH_LOGGER = "";
-	private static String PATH = "";
+	
+	/** Listas para gerir arquivos e dados processados */
 	private static List<String> processedFiles = new ArrayList<String>();
+	private static List<String> listaReportLogger = new ArrayList<String>();
+	private static List<String> listaReport = new ArrayList<String>();	
+
+	/** Variáveis para cálculo de valores, para gerar relatório */
+	private static double VALOR_ID_MAIOR_VENDA = Double.MIN_VALUE;
+	private static double VALOR_PIOR_VENDEDOR = Double.MAX_VALUE;
+	
+	/** Variáveis para gerar de relatório */
+	private static int QTD_CLIENTES = 0;
+	private static int QTD_VENDEDORES = 0;
+	private static int ID_MAIOR_VENDA = 0;
+	private static String PIOR_VENDEDOR = "";
+	
+	/** Flag para controle de verificação de checagem de existencia dos diretórios */
+	private static boolean directoriesChecked = false;
 	
 	public static void startProcess(String path) throws IOException {
-		checkAndSetPaths(path);
+		checkPathsAndDirectories(path);
 		lerDiretorio();
 	}
 	
-	private static void checkAndSetPaths(String path) {		
+	private static void checkPathsAndDirectories(String path) {
+		
 		if (PATH != path) {
-			PATH = path;
+			setDirectoriesChecked(false);
+			setPATH(path);
 			processedFiles.clear();
-			FULL_PATH_IN = path + "\\HOMEPATH\\data\\in";
-			FULL_PATH_OUT = path + "\\HOMEPATH\\data\\out";
-			FULL_PATH_LOGGER = path + "\\HOMEPATH\\data\\logger";
-			checkDirectories();
+			setFULL_PATH_IN(getPATH() + "\\HOMEPATH\\data\\in");
+			setFULL_PATH_OUT(getPATH() + "\\HOMEPATH\\data\\out");
+			setFULL_PATH_LOGGER(getPATH() + "\\HOMEPATH\\data\\logger");
 		};
+
+		if (!isDirectoriesChecked()) {			
+			checkDirectories();
+		}
 	}
 	
 	private static void checkDirectories() {
-		File diretorio_in = new File(FULL_PATH_LOGGER);
-		File diretorio_out = new File(FULL_PATH_LOGGER);
+		System.out.println("chegando diretório");
+		
+		File diretorio_in = new File(FULL_PATH_IN);
+		File diretorio_out = new File(FULL_PATH_OUT);
 		File diretorio_logger = new File(FULL_PATH_LOGGER);
 		
 		if (!diretorio_in.exists()) {
@@ -54,6 +75,9 @@ public class BusinessProcess {
 		if (!diretorio_logger.exists()) {
 			diretorio_logger.mkdirs();
 		}
+		
+		setDirectoriesChecked(true);
+		
 	}
 	
 	
@@ -62,14 +86,14 @@ public class BusinessProcess {
 		File arquivos[];
 		File diretorio = new File(FULL_PATH_IN);
 		arquivos = diretorio.listFiles();
-		
+
 		for(int i = 0; i < arquivos.length; i++){
-			/** Somente analisar os arquivos não processados. */
 			if(!processedFiles.contains(arquivos[i].getName())) {
 				processFile(arquivos[i].getName());
 			}
 		}
 	}
+	
 	
 	/**
 	 * Processar o arquivo e inserir em na lista de arquivos processados. 
@@ -79,35 +103,32 @@ public class BusinessProcess {
 	 */
 	private static void processFile(String fileName) {
 		try {
-//			System.out.println("Processando o arquivo: " + fileName);
-			FILE_NAME = fileName;
-			resetDataReportValues();
-			processedFiles.add(fileName);
-			String fullPath = FULL_PATH_IN + "\\" + fileName;
-			List<String> linhasDadosCompra = Files.readAllLines(Path.of(fullPath));
-			for (String linha : linhasDadosCompra) {
-				processData(linha);
+			setFILE_NAME(fileName);
+			setFILE_PATH(fileName);
+			resetReportDataValues();
+			
+			List<String> listFileData = Files.readAllLines(Path.of(getFILE_PATH()));
+			
+			for (String data : listFileData) {
+				processData(data);
 			}
 			
-			// Gerar relatório
+			processedFiles.add(fileName);
+			
 			gerarReport();
-//			listaReportLogger.size() > 0 ? gerarReport();
+
 			if (listaReportLogger.size() > 0) {
 				gerarReportLogger();
 			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+		
 	
-
-	private static int QTD_CLIENTES = 0;
-	private static int QTD_VENDEDORES = 0;
-	private static int ID_MAIOR_VENDA = 0;
-	private static String PIOR_VENDEDOR = "";
-	
-	
-	private static void resetDataReportValues() {
+	private static void resetReportDataValues() {
+		listaReport.clear();
 		listaReportLogger.clear();
 		setQTD_CLIENTES(0);
 		setQTD_VENDEDORES(0);
@@ -115,34 +136,31 @@ public class BusinessProcess {
 		setPIOR_VENDEDOR("");
 	}
 	
+	
 	private static void gerarReport() {
 		try {
-		String listaNova = 	FULL_PATH_OUT + "\\" + FILE_NAME.trim().toUpperCase()+".txt";
-		
-		List<String> listaReport = new ArrayList<String>();
-		listaReport.add("QTD_VENDEDORES;QTD_CLIENTES;ID_MAIOR_VENDA;PIOR_VENDEDOR");
-		listaReport.add(getQTD_VENDEDORES() + ";" + getQTD_CLIENTES() + ";" + getID_MAIOR_VENDA() + ";" + getPIOR_VENDEDOR());
-		
-		Files.write(Path.of(listaNova), listaReport);
-		System.out.println("Reporte Gerado para o arquivo: " + FILE_NAME);
+			
+			String reportFilePath = getFULL_PATH_OUT() + "\\" +  getFILE_NAME().trim().toLowerCase();
+			
+			listaReport.add("QTD_VENDEDORESçQTD_CLIENTESçID_MAIOR_VENDAçPIOR_VENDEDOR");
+			listaReport.add(getQTD_VENDEDORES() + "ç" + getQTD_CLIENTES() + "ç" + getID_MAIOR_VENDA() + "ç" + getPIOR_VENDEDOR());
+			Files.write(Path.of(reportFilePath), listaReport);
+			
+			System.out.println("Reporte Gerado para o arquivo: " + FILE_NAME);
+			
 		} catch (IOException e) {
-			System.out.println("Problemas ao gerar reporte!");
 			e.printStackTrace();
 		}
-		
 	}
-	private static List<String> listaReportLogger = new ArrayList<String>();
 	
 	private static void gerarReportLogger() {
 		try {
-			File diretorio = new File(FULL_PATH_LOGGER);
-			if (!diretorio.exists()) {
-				diretorio.mkdirs();
-			}
-			String listaNova = 	FULL_PATH_LOGGER + "\\" + FILE_NAME.trim().toUpperCase()+".txt";
-						
-			Files.write(Path.of(listaNova), listaReportLogger);
-			System.out.println("Reporte Logger Gerado para o arquivo: " + FILE_NAME);
+			
+			String reportFilePath = getFULL_PATH_LOGGER() + "\\" +  getFILE_NAME().trim().toLowerCase();
+			Files.write(Path.of(reportFilePath), listaReportLogger);
+			
+			System.err.println("Reporte Logger Gerado para o arquivo: " + getFILE_NAME());
+			
 			} catch (IOException e) {
 				System.out.println("Problemas ao gerar reporte logger!");
 				e.printStackTrace();
@@ -151,9 +169,10 @@ public class BusinessProcess {
 	
 	
 	private static void processData(String dado) {
-		String [] colunas = dado.split("ç");
-		int idData = Integer.parseInt(colunas[0]);
 		try {
+
+			String [] colunas = dado.split("ç");
+			int idData = Integer.parseInt(colunas[0]);
 			switch(idData) {
 				case 001:{
 					sellerLogic(colunas);
@@ -168,19 +187,21 @@ public class BusinessProcess {
 					break;
 				}
 				default:{
-					listaReportLogger.add(dado);
+					String infoReport = dado + "çO valor " + colunas[0] + "não é monitorado";
+					listaReportLogger.add(infoReport);
 					break;
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			listaReportLogger.add(dado +"ç"+ e.getMessage());
 		}
 	}
-		
+
 	private static void sellerLogic(String[] seller) {
 		try {
-			int qtdVendedores = getQTD_VENDEDORES() + 1;
-			setQTD_VENDEDORES(qtdVendedores);
+			
+			setQTD_VENDEDORES(getQTD_VENDEDORES() + 1);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -188,28 +209,57 @@ public class BusinessProcess {
 	
 	private static void customerLogic(String[] customer) {
 		try {
-			int qtdClientes = getQTD_CLIENTES() + 1;
-			setQTD_CLIENTES(qtdClientes);
+
+			setQTD_CLIENTES(getQTD_CLIENTES() + 1);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private static double MAIOR_VENDA = Double.MAX_VALUE;
-	private static double MENOR_VENDA = Double.MIN_VALUE;
 	
 	private static void transactionLogic(String[] transaction) {
 		try {
+			
 			Transaction tran = new Transaction(transaction);
-			ID_MAIOR_VENDA = tran.getTotal() > MENOR_VENDA ? tran.getId() : ID_MAIOR_VENDA;
-			PIOR_VENDEDOR = tran.getTotal() < MAIOR_VENDA ? tran.getVendedor() : PIOR_VENDEDOR;
+			
+			if (tran.getTotal() > getVALOR_ID_MAIOR_VENDA()) {
+				setID_MAIOR_VENDA(tran.getSaleid());
+				setVALOR_ID_MAIOR_VENDA(tran.getTotal());
+			}
+			
+			if (tran.getTotal() < getVALOR_PIOR_VENDEDOR()) {
+				setPIOR_VENDEDOR(tran.getVendedor());
+				setVALOR_PIOR_VENDEDOR(tran.getTotal());
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+	
+	
 
+	/** Getters e Setters */
+	
 	public static int getQTD_CLIENTES() {
 		return QTD_CLIENTES;
+	}
+
+	public static double getVALOR_ID_MAIOR_VENDA() {
+		return VALOR_ID_MAIOR_VENDA;
+	}
+
+	public static void setVALOR_ID_MAIOR_VENDA(double vALOR_ID_MAIOR_VENDA) {
+		VALOR_ID_MAIOR_VENDA = vALOR_ID_MAIOR_VENDA;
+	}
+
+	public static double getVALOR_PIOR_VENDEDOR() {
+		return VALOR_PIOR_VENDEDOR;
+	}
+
+	public static void setVALOR_PIOR_VENDEDOR(double vALOR_PIOR_VENDEDOR) {
+		VALOR_PIOR_VENDEDOR = vALOR_PIOR_VENDEDOR;
 	}
 
 	public static void setQTD_CLIENTES(int qTD_CLIENTES) {
@@ -239,5 +289,86 @@ public class BusinessProcess {
 	public static void setPIOR_VENDEDOR(String pIOR_VENDEDOR) {
 		PIOR_VENDEDOR = pIOR_VENDEDOR;
 	}
+
+	public static String getFILE_NAME() {
+		return FILE_NAME;
+	}
+
+	public static void setFILE_NAME(String fILE_NAME) {
+		FILE_NAME = fILE_NAME;
+	}
+
+	public static String getFULL_PATH_IN() {
+		return FULL_PATH_IN;
+	}
+
+	public static void setFULL_PATH_IN(String fULL_PATH_IN) {
+		FULL_PATH_IN = fULL_PATH_IN;
+	}
+
+	public static String getFULL_PATH_OUT() {
+		return FULL_PATH_OUT;
+	}
+
+	public static void setFULL_PATH_OUT(String fULL_PATH_OUT) {
+		FULL_PATH_OUT = fULL_PATH_OUT;
+	}
+
+	public static String getFULL_PATH_LOGGER() {
+		return FULL_PATH_LOGGER;
+	}
+
+	public static void setFULL_PATH_LOGGER(String fULL_PATH_LOGGER) {
+		FULL_PATH_LOGGER = fULL_PATH_LOGGER;
+	}
+
+	public static String getPATH() {
+		return PATH;
+	}
+
+	public static void setPATH(String pATH) {
+		PATH = pATH;
+	}
+
+	public static String getFILE_PATH() {
+		return FILE_PATH;
+	}
+
+	public static void setFILE_PATH(String fileName) {
+		FILE_PATH = getFULL_PATH_IN() + "\\" + fileName;
+	}
+
+	public static boolean isDirectoriesChecked() {
+		return directoriesChecked;
+	}
+
+	public static void setDirectoriesChecked(boolean directoriesChecked) {
+		BusinessProcess.directoriesChecked = directoriesChecked;
+	}
+
+	public static List<String> getProcessedFiles() {
+		return processedFiles;
+	}
+
+	public static void setProcessedFiles(List<String> processedFiles) {
+		BusinessProcess.processedFiles = processedFiles;
+	}
+
+	public static List<String> getListaReportLogger() {
+		return listaReportLogger;
+	}
+
+	public static void setListaReportLogger(List<String> listaReportLogger) {
+		BusinessProcess.listaReportLogger = listaReportLogger;
+	}
+
+	public static List<String> getListaReport() {
+		return listaReport;
+	}
+
+	public static void setListaReport(List<String> listaReport) {
+		BusinessProcess.listaReport = listaReport;
+	}
+	
 	
 }

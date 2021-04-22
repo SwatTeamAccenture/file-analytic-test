@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Transaction {
 	private int id;
-	private Long saleid;
+	private int saleid;
 	private List<ListaItems> listaItems;
 	private String vendedor;
 	private double total;
@@ -12,7 +12,7 @@ public class Transaction {
 	
 	public Transaction(String[] transaction) {
 		this.id = Integer.parseInt(transaction[0]);
-		this.saleid = Long.parseLong(transaction[1]);
+		this.saleid = Integer.parseInt(transaction[1]);
 		this.listaItems = processItems(transaction[2]);
 		this.vendedor = transaction[3];
 	}
@@ -58,10 +58,10 @@ public class Transaction {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public Long getSaleid() {
+	public int getSaleid() {
 		return saleid;
 	}
-	public void setSaleid(Long saleid) {
+	public void setSaleid(int saleid) {
 		this.saleid = saleid;
 	}
 	public List<ListaItems> getListaItems() {
