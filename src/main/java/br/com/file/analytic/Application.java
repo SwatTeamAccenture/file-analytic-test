@@ -3,6 +3,7 @@ package br.com.file.analytic;
 import br.com.file.analytic.report.ReportRouteBuilder;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,7 +31,7 @@ public class Application {
 
     public Application() throws Exception {
         Path userPath = Paths.get(System.getProperty("user.home"));
-        init(userPath.resolve(DEFAULT_INPUT_DIR), userPath.resolve(DEFAULT_INPUT_DIR));
+        init(userPath.resolve(DEFAULT_INPUT_DIR), userPath.resolve(DEFAULT_OUTPUT_DIR));
     }
 
     public Application(Path inputDir, Path outputDir) throws Exception {
