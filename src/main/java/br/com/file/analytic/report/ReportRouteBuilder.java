@@ -4,6 +4,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +26,9 @@ public class ReportRouteBuilder extends RouteBuilder implements InitializingBean
     private Path inputPath;
     private Path outputPath;
 
+    @Autowired
+    private ReportService reportService;
+
     @Override
     public void afterPropertiesSet() throws Exception {
         this.inputPath = initDir(inputDir);
@@ -45,7 +49,7 @@ public class ReportRouteBuilder extends RouteBuilder implements InitializingBean
                 .to("log:invalidEventError");
 
         from(REPORT_FILE_ENDPOINT)
-                .process(new ReportProcessor())
+                .process(new ReportProcessor(reportService))
                 .marshal().json(JsonLibrary.Jackson)
                 .to("file:" + outputPath)
                 .to("stream:out");

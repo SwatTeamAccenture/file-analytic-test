@@ -4,6 +4,7 @@ import br.com.file.analytic.report.Report;
 import br.com.file.analytic.report.ReportRouteBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import junit.framework.TestCase;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -44,8 +45,8 @@ public class FileAnalyticTestApplicationTests extends TestCase {
 
     @After
     public void stopApplication() throws IOException {
-        Files.delete(inputDir);
-        Files.delete(outputDir);
+        FileUtils.deleteDirectory(inputDir.toFile());
+        FileUtils.deleteDirectory(outputDir.toFile());
     }
 
     @Test
@@ -69,7 +70,7 @@ public class FileAnalyticTestApplicationTests extends TestCase {
         assertEquals(2, report.getClientCount());
         assertEquals(10, report.getMostExpensiveSaleId());
         assertEquals("3245678865434", report.getWorstSalesmanCPF());
-        assertEquals("Paulo", report.getWorstSalesmanCPF());
+        assertEquals("Paulo", report.getWorstSalesmanName());
     }
 
     private Path getInputFile(String filename) {
