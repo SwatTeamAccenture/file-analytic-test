@@ -2,6 +2,7 @@ package br.com.file.analytic.report;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,9 +43,9 @@ public class ReportRouteBuilder extends RouteBuilder {
                 .to("log:invalidEventError");
 
         from(REPORT_FILE_ENDPOINT)
-                .convertBodyTo(String.class)
-                .setHeader("report", Report::new)
-                .split().tokenize("\n",1)
+                .process(new ReportProcessor())
+                .marshal().json(JsonLibrary.Jackson)
+                .to("file:" + outputPath)
                 .to("stream:out");
         from(DELETE_REPORT_ENDPOINT).to("stream:out");
     }
