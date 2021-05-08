@@ -3,30 +3,32 @@ package br.com.file.analytic.report;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
-public class ReportRouteBuilder extends RouteBuilder {
+@Component
+public class ReportRouteBuilder extends RouteBuilder implements InitializingBean {
     private static final String REPORT_FILE_ENDPOINT = "seda:reportFile";
     private static final String DELETE_REPORT_ENDPOINT = "seda:deleteReport";
+
+    @Value("${inputDir}")
+    private String inputDir;
+    @Value("${outputDir}")
+    private String outputDir;
 
     private Path inputPath;
     private Path outputPath;
 
-    public ReportRouteBuilder(Path inputPath, Path outputPath) throws IOException, IllegalArgumentException {
-        this.inputPath = inputPath;
-        this.outputPath = outputPath;
-        initDirs();
-    }
-
-    public ReportRouteBuilder(CamelContext context, Path inputPath, Path outputPath)
-            throws IOException, IllegalArgumentException {
-        super(context);
-        this.inputPath = inputPath;
-        this.outputPath = outputPath;
-        initDirs();
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.inputPath = initDir(inputDir);
+        this.outputPath = initDir(outputDir);
     }
 
     @Override
@@ -50,12 +52,19 @@ public class ReportRouteBuilder extends RouteBuilder {
         from(DELETE_REPORT_ENDPOINT).to("stream:out");
     }
 
-    private void initDirs() throws IOException, IllegalArgumentException {
-        initDir(inputPath);
-        initDir(outputPath);
+    public Path getInputPath() {
+        return inputPath;
     }
 
-    private void initDir(Path dir) throws IOException, IllegalArgumentException {
+    public Path getOutputPath() {
+        return outputPath;
+    }
+
+    private Path initDir(String dir) throws IOException, IllegalArgumentException {
+        return Paths.get(System.getProperty("user.home")).resolve(dir);
+    }
+
+    private Path initDir(Path dir) throws IOException, IllegalArgumentException {
         if (Files.exists(dir) && !Files.isDirectory(dir)) {
             throw new IllegalArgumentException("The input and output paths must not be of a file.");
         }
@@ -63,6 +72,8 @@ public class ReportRouteBuilder extends RouteBuilder {
         if (!Files.exists(dir)) {
             Files.createDirectories(dir);
         }
+
+        return dir;
     }
 
 }

@@ -1,6 +1,7 @@
 package br.com.file.analytic;
 
 import br.com.file.analytic.report.Report;
+import br.com.file.analytic.report.ReportRouteBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import junit.framework.TestCase;
 import org.apache.commons.io.IOUtils;
@@ -9,6 +10,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -16,16 +22,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@RunWith(JUnit4.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest()
+@ContextConfiguration(
+        initializers = SmokeTestContextInitializer.class,
+        classes = Application.class)
 public class FileAnalyticTestApplicationTests extends TestCase {
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     private Path inputDir;
     private Path outputDir;
 
     @Before
     public void startApplication() throws Exception {
-        inputDir = Files.createTempDirectory("input");
-        outputDir = Files.createTempDirectory("output");
+        ReportRouteBuilder reportRouteBuilder = applicationContext.getBean(ReportRouteBuilder.class);
+        inputDir = reportRouteBuilder.getInputPath();
+        outputDir = reportRouteBuilder.getOutputPath();
     }
 
     @After
@@ -36,15 +50,11 @@ public class FileAnalyticTestApplicationTests extends TestCase {
 
     @Test
     public void reportingSmokeTest() throws Exception {
-        Application application = new Application(inputDir, outputDir);
-        application.start();
-
         String filename = "exampleValidInput";
         Path inputFile = getInputFile(filename);
         Path outputFile = outputDir.resolve(filename);
 
         Files.copy(inputFile, inputDir.resolve(filename));
-
         // Aguarda o arquivo de input ser processado
         Thread.sleep(10000);
 
