@@ -1,6 +1,5 @@
 package br.com.file.analytic.report;
 
-import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.springframework.beans.factory.InitializingBean;
@@ -14,6 +13,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Apache Camel route builder that watches changes on the input directory and updates
+ * files in the output directory accordingly.
+ * <p>
+ * When a file is created or updated inside the input directory, a file with the same name
+ * is created or updated inside the output directory with it's report in JSON format.
+ */
 @Component
 public class ReportRouteBuilder extends RouteBuilder implements InitializingBean {
     private static final String REPORT_FILE_ENDPOINT = "seda:reportFile";

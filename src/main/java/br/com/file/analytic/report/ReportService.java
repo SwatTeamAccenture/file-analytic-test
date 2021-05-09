@@ -10,6 +10,15 @@ public class ReportService {
     @Autowired
     private List<ReportEntryParser> reportEntryParsers;
 
+    /**
+     * Finds the appropriate {@link ReportEntryParser} bean to parse an entry and update the report
+     * with it.
+     *
+     * @param report  the report to be updated
+     * @param entry   the entry to be parsed
+     * @return  the same report reference
+     * @throws Exception
+     */
     public Report parse(Report report, String entry) throws Exception {
         ReportEntryParser parser = reportEntryParsers.stream()
                 .filter(reportEntryParser -> reportEntryParser.canParse(entry))

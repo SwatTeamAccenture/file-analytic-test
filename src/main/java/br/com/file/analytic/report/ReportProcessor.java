@@ -8,6 +8,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
+/**
+ * Apache Camel processor for report input files.
+ * <p>
+ * This processor reads an input file line by line and outputs a {@link Report} object
+ *
+ * @see Report
+ */
 public class ReportProcessor implements Processor {
     private ReportService reportService;
     private Report report;
@@ -22,6 +29,7 @@ public class ReportProcessor implements Processor {
         Message message = exchange.getMessage();
         File inputFile = message.getBody(File.class);
 
+        // Reads files line by line to avoid loading huge files to RAM
         BufferedReader bufferedReader = new BufferedReader(new FileReader(inputFile));
         String line;
         while ((line = bufferedReader.readLine()) != null) {

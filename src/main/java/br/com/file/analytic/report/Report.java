@@ -7,6 +7,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A sales repport serializabçe to JSON
+ */
 public class Report {
     private int clientCount;
     private int salesmanCount;

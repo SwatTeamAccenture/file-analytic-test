@@ -6,6 +6,9 @@ import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * An {@link ReportEntryParser} for sale entries
+ */
 @Component
 public class SaleEntryParser extends RegexReportEntryParse {
     private final Pattern pattern = Pattern.compile("^003ç(\\d+)ç\\[(.+)\\]ç([ \\w]+)$");
