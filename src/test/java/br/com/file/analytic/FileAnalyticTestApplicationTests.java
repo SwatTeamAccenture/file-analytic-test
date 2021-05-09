@@ -71,6 +71,9 @@ public class FileAnalyticTestApplicationTests extends TestCase {
         assertEquals(10, report.getMostExpensiveSaleId());
         assertEquals("3245678865434", report.getWorstSalesmanCPF());
         assertEquals("Paulo", report.getWorstSalesmanName());
+
+        Files.delete(inputDir.resolve(filename));
+        Thread.sleep(1000);
     }
 
     private Path getInputFile(String filename) {

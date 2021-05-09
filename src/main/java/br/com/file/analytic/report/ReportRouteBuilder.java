@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,7 +54,14 @@ public class ReportRouteBuilder extends RouteBuilder implements InitializingBean
                 .marshal().json(JsonLibrary.Jackson)
                 .to("file:" + outputPath)
                 .to("stream:out");
-        from(DELETE_REPORT_ENDPOINT).to("stream:out");
+
+        from(DELETE_REPORT_ENDPOINT).process(exchange -> {
+            File inputFile = exchange.getMessage().getBody(File.class);
+            Path outputFile = outputPath.resolve(inputFile.getName());
+            Files.delete(outputFile);
+
+            exchange.getMessage().setBody(outputFile.toString() + " deleted");
+        }).to("stream:out");
     }
 
     public Path getInputPath() {
