@@ -73,7 +73,7 @@ public class ReportRouteBuilder extends RouteBuilder implements InitializingBean
     }
 
     private Path initDir(String dir) throws IOException, IllegalArgumentException {
-        return Paths.get(System.getProperty("user.home")).resolve(dir);
+        return initDir(Paths.get(dir));
     }
 
     private Path initDir(Path dir) throws IOException, IllegalArgumentException {
