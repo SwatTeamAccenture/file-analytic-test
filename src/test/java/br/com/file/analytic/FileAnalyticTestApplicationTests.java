@@ -55,7 +55,7 @@ public class FileAnalyticTestApplicationTests extends TestCase {
 
         Files.copy(inputFile, inputDir.resolve(filename));
         // Aguarda o arquivo de input ser processado
-        Thread.sleep(10000);
+        Thread.sleep(20000);
 
         assertTrue(Files.exists(outputFile));
         assertTrue(Files.isRegularFile(outputFile));
